@@ -1,2 +1,2 @@
 # PBSG
-Python-Basic-Study-Group
+Python-Backend-Study-Group
