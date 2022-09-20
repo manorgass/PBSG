@@ -10,7 +10,7 @@
 
 default는 base  
   
-conda deactivate base(deactivate_가상환경 비활성화)  
+conda deactivate (deactivate_가상환경 비활성화)  
   
 conda activate python_api (python_api 가상환경 활성화)  
 
