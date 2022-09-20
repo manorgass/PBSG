@@ -1,4 +1,4 @@
-###python 기본 command
+### python 기본 command
 
 ---
 
@@ -16,7 +16,7 @@ conda activate python_api (python_api 가상환경 활성화)
 
 ---
 
-###실행 명령어
+### 실행 명령어
   
 FLASK_APP=app.py FLASK_DEBUG=1 flask run
 
