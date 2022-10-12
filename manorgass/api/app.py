@@ -1,6 +1,15 @@
 from flask import Flask, request, jsonify
+from flask.json import JSONEncoder
+
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+
+        return JSONEncoder.default(self, obj)
 
 app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
 
 @app.route("/ping", methods=['GET'])
 def ping():
@@ -38,3 +47,17 @@ def tweet():
     })
 
     return '', 200
+
+@app.route('/follow', methods=['POST'])
+def follow():
+    paylaod             = request.json
+    user_id             = int(paylaod['id'])
+    user_id_to_follow   = int(paylaod['follow'])
+
+    if user_id not in app.users or user_id_to_follow not in app.users:
+        return '사용자가 존재하지 않습니다', 400
+    
+    user = app.users[user_id]
+    user.setdefault('follow', set()).add(user_id_to_follow)
+
+    return jsonify(user)
