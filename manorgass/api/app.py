@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, current_app
 from flask.json import JSONEncoder
 from sqlalchemy import create_engine, text
 
@@ -26,7 +26,7 @@ class CustomJSONEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-app = Flask(__name__)
+app = create_app()
 app.json_encoder = CustomJSONEncoder
 
 
@@ -42,11 +42,32 @@ app.users = {}
 @app.route("/sign-up", methods=['POST'])
 def sign_up():
     new_user = request.json
-    new_user["id"] = app.id_count
-    app.users[app.id_count] = new_user
-    app.id_count = app.id_count + 1
+    new_user_id = app.database.execute(text("""
+    INSERT INTO users(
+        name,
+        email,
+        profile,
+        hashed_password
+    ) VALUES (
+        :name,
+        :email,
+        :profile,
+        :password
+    )
+    """), new_user).lastrowid
 
-    return jsonify(new_user)
+    row = current_app.database.execute(text("""
+    SELECT id, name, email, profile FROM users WHERE id = :user_id
+    """), {'user_id': new_user_id}).fetchone()
+
+    created_user = {
+        'id': row['id'],
+        'name': row['name'],
+        'email': row['email'],
+        'profile': row['profile']
+    } if row else None
+
+    return jsonify(created_user)
 
 
 app.tweets = []
